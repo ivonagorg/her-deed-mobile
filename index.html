@@ -1,0 +1,767 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="theme-color" content="#0d0609">
+<meta name="description" content="Her Deed — A living digital museum preserving the legacy of women who shaped Europe.">
+<title>Her Deed — Digital Museum</title>
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icon-192.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Cinzel:wght@400;600&family=Raleway:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --bg:#0d0609;--bg2:#130a0f;--plum:#1e0e18;
+  --rose:#f4b54c;--gold:#c9956a;--cream:#f0e6d8;
+  --muted:#7a5c68;--white:#fff;--card-bg:#1a0c14;
+  --safe-top:env(safe-area-inset-top,0px);
+  --safe-bottom:env(safe-area-inset-bottom,0px);
+}
+html{scroll-behavior:smooth;overflow-x:hidden;-webkit-text-size-adjust:100%}
+body{background:var(--bg);color:var(--cream);font-family:'Raleway',sans-serif;font-weight:300;
+  -webkit-tap-highlight-color:transparent;overscroll-behavior-y:none;
+  padding-top:var(--safe-top);padding-bottom:var(--safe-bottom)}
+body::before{content:'';position:fixed;inset:0;z-index:9990;
+  background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='1'/%3E%3C/svg%3E");
+  opacity:.02;pointer-events:none}
+
+/* ── BOTTOM TAB BAR ── */
+.tab-bar{position:fixed;bottom:0;left:0;right:0;z-index:500;
+  display:flex;justify-content:space-around;align-items:flex-end;
+  padding:0.6rem 0 calc(0.6rem + var(--safe-bottom));
+  background:rgba(13,6,9,.95);backdrop-filter:blur(16px);
+  border-top:1px solid rgba(240,230,216,.06)}
+.tab-btn{display:flex;flex-direction:column;align-items:center;gap:0.2rem;
+  background:none;border:none;color:var(--muted);
+  font-family:'Cinzel',serif;font-size:0.55rem;letter-spacing:0.12em;
+  text-transform:uppercase;cursor:pointer;transition:color .2s;padding:0.3rem 0.6rem}
+.tab-btn.active{color:var(--rose)}
+.tab-btn svg{width:20px;height:20px;stroke:currentColor;fill:none;stroke-width:1.5}
+.tab-btn.active svg{stroke:var(--rose)}
+
+/* ── PAGES ── */
+.page{display:none;min-height:100vh;padding-bottom:calc(4rem + var(--safe-bottom))}
+.page.active{display:block}
+
+/* ── HEADER ── */
+.mobile-header{position:sticky;top:0;z-index:400;
+  padding:calc(0.8rem + var(--safe-top)) 1.2rem 0.8rem;
+  background:rgba(13,6,9,.92);backdrop-filter:blur(14px);
+  border-bottom:1px solid rgba(240,230,216,.04);
+  display:flex;justify-content:space-between;align-items:center}
+.header-logo{font-family:'Cinzel',serif;font-size:0.72rem;letter-spacing:0.3em;color:var(--cream)}
+.header-badge{font-family:'Cinzel',serif;font-size:0.5rem;letter-spacing:0.2em;
+  color:var(--muted);border:1px solid rgba(122,92,104,.3);padding:0.25rem 0.5rem}
+
+/* ── HOME PAGE ── */
+.hero-mobile{padding:3rem 1.4rem 2rem;position:relative;overflow:hidden}
+.hero-mobile::before{content:'';position:absolute;inset:0;
+  background:radial-gradient(ellipse 70% 80% at 80% 30%,rgba(184,76,101,.07) 0%,transparent 60%)}
+.hero-eyebrow{font-family:'Cinzel',serif;font-size:0.52rem;letter-spacing:0.35em;
+  color:var(--rose);text-transform:uppercase;margin-bottom:0.6rem;
+  opacity:0;animation:fadeUp .7s .1s forwards}
+.hero-title{font-family:'Cormorant Garamond',serif;font-size:3.2rem;font-weight:300;
+  line-height:.88;color:var(--white);margin-bottom:0.6rem;
+  opacity:0;animation:fadeUp .8s .2s forwards}
+.hero-title em{font-style:italic;color:var(--rose)}
+.hero-sub{font-size:0.82rem;font-weight:300;color:var(--muted);line-height:1.85;
+  max-width:340px;opacity:0;animation:fadeUp .7s .4s forwards}
+.hero-cta{margin-top:1.8rem;opacity:0;animation:fadeUp .7s .6s forwards}
+.btn-primary{display:inline-block;font-family:'Cinzel',serif;font-size:0.58rem;
+  letter-spacing:0.3em;text-transform:uppercase;color:var(--cream);
+  border:1px solid rgba(240,230,216,.25);padding:0.9rem 1.8rem;
+  background:none;position:relative;overflow:hidden;cursor:pointer;
+  -webkit-tap-highlight-color:transparent}
+.btn-primary:active{background:rgba(244,181,76,.15);border-color:var(--rose)}
+
+/* ── ABOUT SECTION ── */
+.about-section{padding:2.5rem 1.4rem;border-top:1px solid rgba(240,230,216,.06)}
+.section-label{font-family:'Cinzel',serif;font-size:0.52rem;letter-spacing:0.4em;
+  color:var(--rose);margin-bottom:1rem;display:block;text-transform:uppercase}
+.about-statement{font-family:'Cormorant Garamond',serif;font-size:1.6rem;font-weight:300;
+  line-height:1.3;color:var(--white);margin-bottom:1rem}
+.about-statement em{font-style:italic;color:var(--gold)}
+.about-body{font-size:0.8rem;line-height:1.9;color:rgba(240,230,216,.6);margin-bottom:1.5rem}
+.about-body strong{color:var(--cream);font-weight:400}
+.stats-row{display:grid;grid-template-columns:1fr 1fr;gap:1rem;
+  padding-top:1.2rem;border-top:1px solid rgba(240,230,216,.06)}
+.stat-num{font-family:'Cormorant Garamond',serif;font-size:1.6rem;font-weight:300;
+  color:var(--rose);line-height:1}
+.stat-label{font-size:0.52rem;letter-spacing:0.15em;color:var(--muted);
+  margin-top:0.2rem;text-transform:uppercase}
+
+/* ── COLLECTION PAGE ── */
+.collection-header{padding:2rem 1.4rem 1rem;
+  border-bottom:1px solid rgba(240,230,216,.06)}
+.collection-title{font-family:'Cormorant Garamond',serif;font-size:1.4rem;
+  font-weight:300;color:var(--white)}
+.collection-sub{font-size:0.65rem;color:var(--muted);margin-top:0.3rem;letter-spacing:0.1em}
+
+/* ── LOCATION CARDS ── */
+.location-list{padding:0.8rem}
+.location-card{position:relative;border-radius:0;overflow:hidden;
+  margin-bottom:2px;background:var(--card-bg);
+  border:1px solid rgba(240,230,216,.04);min-height:140px;
+  display:flex;align-items:flex-end;cursor:pointer;
+  -webkit-tap-highlight-color:transparent;transition:border-color .3s}
+.location-card:active{border-color:rgba(184,76,101,.4)}
+.location-card.locked{opacity:.5;pointer-events:none}
+.loc-mosaic{position:absolute;inset:0;display:grid;grid-template-columns:1fr 1fr;grid-template-rows:1fr 1fr;gap:1px}
+.loc-mosaic img{width:100%;height:100%;object-fit:cover;object-position:center top}
+.loc-overlay{position:absolute;inset:0;background:linear-gradient(to top,rgba(13,6,9,.92) 0%,rgba(13,6,9,.1) 55%)}
+.loc-info{position:relative;z-index:2;padding:1rem 1.2rem;width:100%}
+.loc-name{font-family:'Cormorant Garamond',serif;font-size:1.2rem;color:var(--white)}
+.loc-detail{font-size:0.58rem;color:var(--muted);margin-top:0.15rem;letter-spacing:0.12em}
+.loc-arrow{font-family:'Cinzel',serif;font-size:0.5rem;color:var(--gold);margin-top:0.5rem;letter-spacing:0.2em}
+.lock-badge{position:absolute;top:0.8rem;right:0.8rem;z-index:5;
+  font-family:'Cinzel',serif;font-size:0.45rem;letter-spacing:0.18em;
+  color:var(--muted);border:1px solid rgba(122,92,104,.3);
+  padding:0.2rem 0.5rem;background:rgba(13,6,9,.75)}
+
+/* ── SCULPTURE GRID ── */
+.sculpture-grid{display:grid;grid-template-columns:1fr 1fr;gap:2px;padding:0.8rem}
+.sculpture-card{position:relative;aspect-ratio:3/4;background:var(--card-bg);
+  overflow:hidden;border:1px solid rgba(240,230,216,.04);
+  cursor:pointer;-webkit-tap-highlight-color:transparent;transition:border-color .3s}
+.sculpture-card:active{border-color:rgba(244,181,76,.4)}
+.sculpture-card img{position:absolute;inset:0;width:100%;height:100%;
+  object-fit:cover;object-position:center top}
+.sc-gradient{position:absolute;inset:0;
+  background:linear-gradient(to top,rgba(8,4,7,.94) 0%,rgba(8,4,7,.05) 50%)}
+.sc-info{position:absolute;bottom:0;left:0;right:0;padding:0.8rem;z-index:2}
+.sc-name{font-family:'Cormorant Garamond',serif;font-size:0.85rem;color:var(--white);line-height:1.15}
+.sc-role{font-size:0.48rem;letter-spacing:0.1em;color:rgba(122,92,104,.7);margin-top:0.15rem}
+
+/* ── DETAIL PAGE ── */
+.detail-page{padding-bottom:calc(5rem + var(--safe-bottom))}
+.detail-hero{position:relative;height:50vh;min-height:300px;overflow:hidden}
+.detail-hero img{width:100%;height:100%;object-fit:cover;object-position:center top}
+.detail-hero-gradient{position:absolute;inset:0;
+  background:linear-gradient(to top,rgba(13,6,9,1) 0%,rgba(13,6,9,.3) 40%,transparent 70%)}
+.detail-back{position:absolute;top:calc(0.8rem + var(--safe-top));left:0.8rem;z-index:10;
+  display:flex;align-items:center;gap:0.4rem;
+  font-family:'Cinzel',serif;font-size:0.5rem;letter-spacing:0.25em;
+  color:var(--cream);background:rgba(13,6,9,.6);backdrop-filter:blur(8px);
+  border:1px solid rgba(240,230,216,.1);padding:0.5rem 0.8rem;
+  cursor:pointer;-webkit-tap-highlight-color:transparent;text-transform:uppercase}
+.detail-back svg{width:12px;height:12px;stroke:currentColor;fill:none;stroke-width:1.5}
+.detail-body{padding:1.4rem;position:relative;z-index:2;margin-top:-3rem}
+.detail-country{font-family:'Cinzel',serif;font-size:0.5rem;letter-spacing:0.35em;
+  color:var(--rose);text-transform:uppercase;margin-bottom:0.5rem}
+.detail-name{font-family:'Cormorant Garamond',serif;font-size:1.8rem;font-weight:400;
+  color:var(--white);line-height:1.1}
+.detail-years{font-family:'Cormorant Garamond',serif;font-size:0.9rem;font-style:italic;
+  color:var(--gold);margin-top:0.25rem}
+.detail-divider{width:40px;height:1px;background:var(--rose);margin:1.2rem 0}
+.detail-tags{display:flex;flex-wrap:wrap;gap:0.3rem;margin-bottom:1.2rem}
+.detail-tag{font-size:0.48rem;letter-spacing:0.15em;text-transform:uppercase;
+  padding:0.25rem 0.5rem;border:1px solid rgba(201,149,106,.25);color:var(--gold)}
+.detail-story{font-size:0.82rem;line-height:1.85;color:var(--white);margin-bottom:1.2rem}
+.detail-story strong{color:var(--cream);font-weight:500}
+.detail-story p{margin-bottom:0.8rem}
+.detail-achievement{background:rgba(184,76,101,.06);border-left:2px solid var(--rose);
+  padding:0.8rem 1rem;margin-bottom:0.8rem;font-size:0.72rem;line-height:1.75;color:var(--white)}
+.detail-achievement strong{color:var(--rose);display:block;margin-bottom:0.15rem;
+  font-size:0.52rem;letter-spacing:0.12em;text-transform:uppercase}
+.detail-actions{display:flex;flex-direction:column;gap:0.5rem;margin-top:1.5rem}
+.action-btn{display:flex;align-items:center;justify-content:center;gap:0.5rem;
+  font-family:'Cinzel',serif;font-size:0.5rem;letter-spacing:0.25em;text-transform:uppercase;
+  padding:0.85rem 1rem;border:1px solid rgba(240,230,216,.18);color:var(--cream);
+  background:none;cursor:pointer;-webkit-tap-highlight-color:transparent;text-decoration:none}
+.action-btn:active{background:rgba(244,181,76,.1);border-color:var(--rose)}
+.action-btn svg{width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:1.5;flex-shrink:0}
+.action-btn.primary{color:var(--bg);background:var(--rose);border-color:var(--rose)}
+.action-btn.primary svg{fill:var(--bg);stroke:none}
+.action-btn.primary:active{background:#cc5570;border-color:#cc5570}
+
+/* ── 3D VIEWER ── */
+.viewer-overlay{position:fixed;inset:0;z-index:2000;background:rgba(0,0,0,.94);
+  backdrop-filter:blur(10px);display:none;flex-direction:column;padding-top:var(--safe-top)}
+.viewer-overlay.open{display:flex}
+.viewer-header{display:flex;justify-content:space-between;align-items:center;
+  padding:0.7rem 1rem;border-bottom:1px solid rgba(244,181,76,.1);flex-shrink:0}
+.viewer-title{font-family:'Cinzel',serif;font-size:0.5rem;letter-spacing:0.3em;
+  color:rgba(244,181,76,.8);text-transform:uppercase}
+.viewer-close{background:none;border:1px solid rgba(240,230,216,.15);color:var(--cream);
+  width:32px;height:32px;cursor:pointer;font-size:13px;display:flex;align-items:center;
+  justify-content:center;font-family:'Cinzel',serif}
+.viewer-frame{width:100%;flex:1;border:none;background:#0d0609}
+
+/* ── EXPLORE PAGE ── */
+.explore-section{padding:1.4rem}
+.explore-intro{text-align:center;padding:2rem 0.5rem}
+.explore-icon{font-size:2.5rem;color:var(--rose);opacity:.3;margin-bottom:0.8rem}
+.explore-heading{font-family:'Cormorant Garamond',serif;font-size:1.5rem;font-weight:300;
+  color:rgba(240,236,228,.6);line-height:1.3;margin-bottom:0.5rem}
+.explore-heading span{color:var(--rose)}
+.explore-note{font-size:0.5rem;letter-spacing:0.15em;text-transform:uppercase;
+  color:rgba(240,236,228,.35)}
+.explore-form{margin-top:1.5rem}
+.explore-label{font-family:'Cinzel',serif;font-size:0.5rem;letter-spacing:0.3em;
+  color:var(--rose);text-transform:uppercase;margin-bottom:0.6rem;display:block}
+.explore-select{width:100%;background:var(--card-bg);border:1px solid rgba(240,230,216,.12);
+  color:var(--cream);font-family:'Cormorant Garamond',serif;font-size:1rem;
+  padding:0.7rem 0.8rem;appearance:none;-webkit-appearance:none;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='%237a5c68'%3E%3Cpath d='M2 4l4 4 4-4'/%3E%3C/svg%3E");
+  background-repeat:no-repeat;background-position:right 0.8rem center;margin-bottom:1rem}
+.explore-year-display{font-family:'Cormorant Garamond',serif;font-size:2.6rem;font-weight:300;
+  font-style:italic;color:var(--rose);text-align:center;margin:0.3rem 0}
+.explore-era{text-align:center;font-size:0.46rem;letter-spacing:0.18em;text-transform:uppercase;
+  color:var(--muted);margin-bottom:0.2rem}
+.explore-slider{width:100%;-webkit-appearance:none;appearance:none;background:transparent;
+  margin:0.5rem 0;cursor:pointer;height:30px}
+.explore-slider::-webkit-slider-runnable-track{height:1px;background:rgba(200,165,90,.2)}
+.explore-slider::-webkit-slider-thumb{-webkit-appearance:none;width:22px;height:22px;
+  background:var(--bg);border:2px solid var(--rose);border-radius:50%;margin-top:-11px;
+  box-shadow:0 0 0 4px rgba(200,165,90,.12)}
+.explore-range{display:flex;justify-content:space-between;font-size:0.42rem;color:var(--muted)}
+.sector-grid{display:grid;grid-template-columns:1fr 1fr;gap:0.4rem;margin-bottom:1.2rem}
+.sector-btn{background:rgba(255,255,255,.02);border:1px solid rgba(240,230,216,.1);
+  color:rgba(240,236,228,.5);padding:0.5rem;text-align:left;cursor:pointer;
+  font-family:'Cormorant Garamond',serif;font-size:0.78rem;font-style:italic;
+  display:flex;align-items:center;gap:0.3rem;transition:all .15s;
+  -webkit-tap-highlight-color:transparent}
+.sector-btn:active,.sector-btn.active{border-color:var(--rose);color:var(--rose);
+  background:rgba(200,165,90,.1)}
+.discover-btn{width:100%;padding:0.9rem;background:transparent;
+  border:1px solid rgba(200,165,90,.4);color:var(--rose);
+  font-family:'Cinzel',serif;font-size:0.55rem;letter-spacing:0.25em;
+  text-transform:uppercase;cursor:pointer;position:relative;overflow:hidden;
+  -webkit-tap-highlight-color:transparent;transition:all .2s}
+.discover-btn:active:not(:disabled){background:rgba(200,165,90,.15);border-color:var(--rose)}
+.discover-btn:disabled{opacity:.3;cursor:not-allowed}
+.discover-btn.loading{color:transparent}
+.discover-btn.loading::after{content:'';position:absolute;width:14px;height:14px;
+  top:50%;left:50%;transform:translate(-50%,-50%);border:1px solid var(--rose);
+  border-top-color:transparent;border-radius:50%;animation:spin .8s linear infinite}
+@keyframes spin{to{transform:translate(-50%,-50%) rotate(360deg)}}
+
+/* ── EXPLORE RESULTS ── */
+.results-section{padding:1rem 0}
+.results-header{border-bottom:1px solid rgba(200,165,90,.14);padding-bottom:0.6rem;margin-bottom:0.6rem}
+.results-title{font-family:'Cormorant Garamond',serif;font-size:1.4rem;font-weight:300;line-height:1.1}
+.results-title .loc{font-style:italic;color:var(--rose)}
+.results-count{font-size:0.46rem;letter-spacing:0.12em;text-transform:uppercase;
+  color:rgba(240,236,228,.4);margin-top:0.3rem}
+.results-summary{border-left:1px solid var(--muted);padding:0.1rem 0 0.1rem 0.8rem;
+  margin-bottom:1.2rem}
+.results-summary p{font-size:0.82rem;font-weight:300;font-style:italic;
+  color:rgba(240,236,228,.6);line-height:1.65}
+.result-card{background:var(--card-bg);border:1px solid rgba(240,230,216,.04);
+  padding:1rem;margin-bottom:2px;animation:fadeUp .35s ease both}
+.result-sector{font-size:0.44rem;letter-spacing:0.15em;text-transform:uppercase;
+  padding:0.1rem 0.3rem;border:1px solid rgba(200,165,90,.3);color:var(--gold);
+  display:inline-block;margin-bottom:0.4rem}
+.result-name{font-family:'Cormorant Garamond',serif;font-size:1.05rem;font-weight:400;
+  color:var(--white);line-height:1.15;margin-bottom:0.1rem}
+.result-dates{font-size:0.44rem;letter-spacing:0.08em;text-transform:uppercase;
+  color:rgba(240,236,228,.35);margin-bottom:0.4rem}
+.result-achievement{font-size:0.76rem;font-weight:300;line-height:1.6;
+  color:rgba(240,236,228,.65);margin-bottom:0.3rem}
+.result-significance{font-size:0.68rem;font-style:italic;color:var(--muted);
+  border-left:1px solid var(--muted);padding-left:0.4rem;line-height:1.5}
+.results-footer{margin-top:1.2rem;padding:0.8rem 0;border-top:1px solid rgba(200,165,90,.14);
+  font-size:0.42rem;letter-spacing:0.12em;text-transform:uppercase;
+  color:rgba(240,236,228,.25);text-align:center}
+
+/* ── CONTRIBUTE PAGE ── */
+.contribute-section{padding:2.5rem 1.4rem;text-align:center}
+.contribute-title{font-family:'Cormorant Garamond',serif;font-size:1.5rem;font-weight:300;
+  color:var(--white);line-height:1.25;margin-bottom:0.8rem}
+.contribute-title em{font-style:italic;color:var(--gold)}
+.contribute-sub{font-size:0.78rem;color:var(--muted);margin-bottom:1.5rem;line-height:1.85}
+.contribute-btn{display:inline-block;font-family:'Cinzel',serif;font-size:0.52rem;
+  letter-spacing:0.3em;text-transform:uppercase;color:var(--cream);
+  border:1px solid rgba(244,181,76,.5);padding:0.85rem 1.5rem;
+  background:none;cursor:pointer;margin-bottom:0.5rem;
+  -webkit-tap-highlight-color:transparent}
+.contribute-btn:active{background:rgba(244,181,76,.15)}
+
+/* ── FOOTER ── */
+.mobile-footer{padding:1.5rem 1.4rem 2rem;border-top:1px solid rgba(240,230,216,.04);
+  text-align:center}
+.footer-brand{font-family:'Cinzel',serif;font-size:0.7rem;letter-spacing:0.25em;color:var(--muted)}
+.footer-note{font-size:0.55rem;color:rgba(122,92,104,.5);margin-top:0.3rem;letter-spacing:0.08em}
+
+/* ── ANIMATIONS ── */
+.reveal{opacity:0;transform:translateY(18px);transition:opacity .6s ease,transform .6s ease}
+.reveal.visible{opacity:1;transform:translateY(0)}
+@keyframes fadeUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+</style>
+</head>
+<body>
+
+<!-- ══ TAB BAR ══ -->
+<nav class="tab-bar">
+  <button class="tab-btn active" onclick="switchTab('home')" id="tab-home">
+    <svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+    Home
+  </button>
+  <button class="tab-btn" onclick="switchTab('collection')" id="tab-collection">
+    <svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
+    Museum
+  </button>
+  <button class="tab-btn" onclick="switchTab('explore')" id="tab-explore">
+    <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+    Explore
+  </button>
+  <button class="tab-btn" onclick="switchTab('contribute')" id="tab-contribute">
+    <svg viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+    Contribute
+  </button>
+</nav>
+
+<!-- ══ HOME PAGE ══ -->
+<div id="page-home" class="page active">
+  <div class="mobile-header">
+    <div class="header-logo">HER DEED</div>
+    <div class="header-badge">v0.2</div>
+  </div>
+
+  <section class="hero-mobile">
+    <p class="hero-eyebrow">A Heritage Restored</p>
+    <h1 class="hero-title">Her<br><em>Deed</em></h1>
+    <p class="hero-sub">A living digital museum preserving the legacy of women who shaped Europe — through 3D sculpture, story, and memory.</p>
+    <div class="hero-cta">
+      <button class="btn-primary" onclick="switchTab('collection')">Enter the Museum</button>
+    </div>
+  </section>
+
+  <section class="about-section reveal">
+    <span class="section-label">About the Project</span>
+    <h2 class="about-statement">We believe the women who shaped history deserve to be <em>remembered.</em></h2>
+    <p class="about-body">Her Deed is a digital archive and living museum dedicated to the women of Europe whose stories, monuments, and achievements have been overlooked, damaged, or erased.<br><br>Starting in <strong>Skopje</strong>, we are building outward across Europe, one location at a time.</p>
+    <div class="stats-row">
+      <div><div class="stat-num">20+</div><div class="stat-label">Sculptures Digitised</div></div>
+      <div><div class="stat-num">3</div><div class="stat-label">Partner Countries</div></div>
+      <div><div class="stat-num">3D</div><div class="stat-label">Interactive Models</div></div>
+      <div><div class="stat-num">∞</div><div class="stat-label">Open to Europe</div></div>
+    </div>
+  </section>
+
+  <footer class="mobile-footer">
+    <div class="footer-brand">HER DEED</div>
+    <div class="footer-note">Skopje · Montenegro · Slovenia · A growing European archive</div>
+  </footer>
+</div>
+
+<!-- ══ COLLECTION PAGE ══ -->
+<div id="page-collection" class="page">
+  <div class="mobile-header">
+    <div class="header-logo">MUSEUM</div>
+  </div>
+
+  <!-- Location list -->
+  <div id="view-locations">
+    <div class="collection-header">
+      <div class="collection-title">Select a Location</div>
+      <div class="collection-sub">Phase I — 3 Partner Cities</div>
+    </div>
+    <div class="location-list" id="location-list"></div>
+  </div>
+
+  <!-- Sculptures view -->
+  <div id="view-sculptures" style="display:none">
+    <div class="collection-header" style="display:flex;align-items:center;gap:0.8rem">
+      <button onclick="showLocations()" style="background:none;border:none;color:var(--cream);cursor:pointer;padding:0.3rem">
+        <svg width="18" height="18" viewBox="0 0 24 24" stroke="currentColor" fill="none" stroke-width="1.5"><polyline points="15 18 9 12 15 6"/></svg>
+      </button>
+      <div>
+        <div class="collection-title" id="city-title">Skopje</div>
+        <div class="collection-sub" id="city-sub">4 sculptures available</div>
+      </div>
+    </div>
+    <div class="sculpture-grid" id="sculpture-grid"></div>
+  </div>
+
+  <!-- Detail view -->
+  <div id="view-detail" class="detail-page" style="display:none"></div>
+
+  <footer class="mobile-footer">
+    <div class="footer-brand">HER DEED</div>
+    <div class="footer-note">Skopje Collection</div>
+  </footer>
+</div>
+
+<!-- ══ EXPLORE PAGE ══ -->
+<div id="page-explore" class="page">
+  <div class="mobile-header">
+    <div class="header-logo">EXPLORE</div>
+  </div>
+  <div class="explore-section" id="explore-content"></div>
+</div>
+
+<!-- ══ CONTRIBUTE PAGE ══ -->
+<div id="page-contribute" class="page">
+  <div class="mobile-header">
+    <div class="header-logo">CONTRIBUTE</div>
+  </div>
+  <section class="contribute-section">
+    <span class="section-label reveal">Join the Archive</span>
+    <h2 class="contribute-title reveal">Know a <em>woman's story</em> that belongs here?</h2>
+    <p class="contribute-sub reveal">Her Deed is a living archive. Anyone can submit photos, documents, or stories of women whose legacy deserves to be preserved and shared.</p>
+    <button class="contribute-btn reveal">Submit a Story</button>
+  </section>
+  <footer class="mobile-footer">
+    <div class="footer-brand">HER DEED</div>
+    <div class="footer-note">A growing European archive</div>
+  </footer>
+</div>
+
+<!-- ══ 3D VIEWER OVERLAY ══ -->
+<div class="viewer-overlay" id="viewer-overlay">
+  <div class="viewer-header">
+    <span class="viewer-title" id="viewer-title"></span>
+    <button class="viewer-close" onclick="closeViewer()">✕</button>
+  </div>
+  <iframe class="viewer-frame" id="viewer-frame" src="" allow="autoplay;fullscreen;xr-spatial-tracking" allowfullscreen></iframe>
+</div>
+
+<script>
+// ── DATA ──
+const sculptures = [
+  {
+    name:"Vera Jocić", years:"1923 – 1944", country:"Skopje, North Macedonia",
+    tags:["Partisan","National Hero","People's Hero of Yugoslavia"],
+    modelUrl:"#", mapUrl:"https://www.google.com/maps/search/Vardar+River+Skopje",
+    story:`<p>Born in Sinđelić near Skopje, <strong>Vera Jocić</strong> joined the Third Macedonian Strike Brigade and became one of its most courageous fighters. She was mortally wounded on May 20, 1944 near Osogovo Mountain and died three days later, aged 20.</p><p>Her death moved her comrade, the poet Aco Šopov, to write his celebrated poem <em>"Eyes"</em> in her honour. Her bronze bust — sculpted by her sister Vida Jocić — stood on the banks of the Vardar River in Skopje.</p>`,
+    achievements:[
+      {label:"People's Hero of Yugoslavia",text:"Proclaimed a National Hero on December 20, 1951 — one of the few women to receive this honour posthumously."},
+      {label:"Stolen Monument",text:"Her bust was stolen from a Skopje park in 2026. This digital sculpture now preserves the only public version of her memorial."}
+    ]
+  },
+  {
+    name:"Vera Ciriviri Trena", years:"1921 – 1944", country:"Prilep / Skopje, North Macedonia",
+    tags:["Partisan","Communist Organiser","Anti-Fascist"],
+    modelUrl:"#", mapUrl:"https://www.google.com/maps/search/Stip+North+Macedonia",
+    story:`<p>Born in Prilep in 1921, <strong>Vera Ciriviri Trena</strong> joined the Communist Party at 19 and became one of the most trusted organisers of the National Liberation War.</p><p>On July 15, 1944, surrounded by police in Štip and with no escape, she chose to take her own life rather than surrender. Her last words: <em>"We will win!"</em></p>`,
+    achievements:[
+      {label:"Europa CEPT Stamp",text:"Honoured on a North Macedonian stamp for the Europa CEPT 'Famous Women' series in 1996."},
+      {label:"Her Last Words",text:"\"We will win!\" — one of the most powerful testaments of the Macedonian partisan resistance."}
+    ]
+  },
+  {
+    name:"Mara Ugrinovska – Gina", years:"1916 – 1943", country:"Mavrovo, North Macedonia",
+    tags:["Partisan","First Female Fighter of Mavrovo","Anti-Fascist"],
+    modelUrl:"#", mapUrl:"https://www.google.com/maps/search/Mavrovo+North+Macedonia",
+    story:`<p><strong>Mara Ugrinovska – Gina</strong> was born in Mavrovo in 1916. In May 1943 she joined the partisans — <em>the first woman from the Mavrovo region to do so</em>.</p><p>On October 1, 1943, surrounded on Bukovik mountain, she held the retreat with fellow partisan Olga Miceska until she fell. She was 27.</p>`,
+    achievements:[
+      {label:"First Female Partisan of Mavrovo",text:"Her decision to join in May 1943 inspired other young women in her village to follow."},
+      {label:"Remembered in Stone",text:"A bust stands in her memory in the Mavrovo region. A street in Gostivar bears her name."}
+    ]
+  },
+  {
+    name:"Grozdoberka", years:"A Collective Symbol", country:"North Macedonia",
+    tags:["Symbol","Rural Life","Working Women","Folk Tradition"],
+    modelUrl:"https://sketchfab.com/models/de86812ee17142a982ca4bf8cbad18d7/embed",
+    mapUrl:"https://www.google.com/maps/search/Macedonian+vineyards",
+    story:`<p><strong>Grozdoberka</strong> — <em>the woman grape-picker</em> — is not one woman but all of them. She represents the rural women of Macedonia who worked the vineyards, carried the harvest, and sustained their communities across generations.</p><p>The grape harvest, the <em>berba</em>, was the rhythm of Macedonian village life — and women were its backbone. This sculpture is their missing monument.</p>`,
+    achievements:[
+      {label:"A Collective Monument",text:"Built not for one woman, but for all the unnamed women of rural Macedonia."},
+      {label:"Living Symbol",text:"The berba tradition remains a cornerstone of Macedonian folk culture and collective memory."}
+    ]
+  }
+];
+
+const SECTORS=[
+  {id:"all",label:"All Sectors",g:"◈"},{id:"science",label:"Science",g:"⚗"},
+  {id:"politics",label:"Politics",g:"⚖"},{id:"arts",label:"Arts",g:"✦"},
+  {id:"activism",label:"Activism",g:"✊"},{id:"sport",label:"Sport",g:"◎"},
+  {id:"business",label:"Business",g:"◆"},{id:"education",label:"Education",g:"◉"}
+];
+
+const COUNTRIES = ["North Macedonia","Slovenia","Montenegro","Serbia","Croatia","Bosnia & Herzegovina","Albania","Greece","Bulgaria","Turkey","Italy","France","Germany","United Kingdom","Spain","United States","India","Japan","Brazil","Egypt","Nigeria","South Africa","Australia","Canada","Mexico","China","Russia","Poland","Sweden","Norway"];
+
+// ── TAB SWITCHING ──
+function switchTab(id) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.getElementById('page-'+id).classList.add('active');
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('tab-'+id).classList.add('active');
+  window.scrollTo(0,0);
+  triggerReveals('page-'+id);
+  if(id==='collection') showLocations();
+  if(id==='explore') initExplore();
+}
+
+function triggerReveals(pageId) {
+  setTimeout(()=>{
+    document.querySelectorAll('#'+pageId+' .reveal').forEach(el=>{
+      if(el.getBoundingClientRect().top < window.innerHeight*1.1) el.classList.add('visible');
+    });
+  },80);
+}
+
+// ── SCROLL REVEAL ──
+const obs = new IntersectionObserver(entries=>{
+  entries.forEach(e=>{if(e.isIntersecting){e.target.classList.add('visible');obs.unobserve(e.target)}});
+},{threshold:.08});
+document.querySelectorAll('.reveal').forEach(el=>obs.observe(el));
+
+// ── COLLECTION: LOCATIONS ──
+function showLocations() {
+  document.getElementById('view-locations').style.display='';
+  document.getElementById('view-sculptures').style.display='none';
+  document.getElementById('view-detail').style.display='none';
+  renderLocations();
+}
+
+function renderLocations() {
+  const el = document.getElementById('location-list');
+  el.innerHTML = `
+    <div class="location-card" onclick="openCity('skopje')">
+      <div class="loc-mosaic"><div style="background:#1a0c14;grid-column:span 2;grid-row:span 2;display:flex;align-items:center;justify-content:center">
+        <span style="font-family:'Cormorant Garamond',serif;font-size:2.5rem;color:rgba(244,181,76,.15)">Скопје</span>
+      </div></div>
+      <div class="loc-overlay"></div>
+      <div class="loc-info">
+        <div class="loc-name">Skopje</div>
+        <div class="loc-detail">North Macedonia · 4 Sculptures</div>
+        <div class="loc-arrow">Enter collection →</div>
+      </div>
+    </div>
+    <div class="location-card locked">
+      <div class="lock-badge">Coming Soon</div>
+      <div class="loc-overlay" style="background:rgba(13,6,9,.7)"></div>
+      <div class="loc-info">
+        <div class="loc-name" style="color:rgba(240,230,216,.35)">Montenegro</div>
+        <div class="loc-detail">Partner Country · In Preparation</div>
+      </div>
+    </div>
+    <div class="location-card locked">
+      <div class="lock-badge">Coming Soon</div>
+      <div class="loc-overlay" style="background:rgba(13,6,9,.7)"></div>
+      <div class="loc-info">
+        <div class="loc-name" style="color:rgba(240,230,216,.35)">Slovenia</div>
+        <div class="loc-detail">Partner Country · In Preparation</div>
+      </div>
+    </div>
+  `;
+}
+
+function openCity(city) {
+  document.getElementById('view-locations').style.display='none';
+  document.getElementById('view-sculptures').style.display='';
+  document.getElementById('view-detail').style.display='none';
+  document.getElementById('city-title').textContent='Skopje Collection';
+  document.getElementById('city-sub').textContent=sculptures.length+' works in this collection';
+  renderSculptures();
+  window.scrollTo(0,0);
+}
+
+function renderSculptures() {
+  const grid = document.getElementById('sculpture-grid');
+  grid.innerHTML = sculptures.map((s,i)=>`
+    <div class="sculpture-card" onclick="openDetail(${i})" style="animation-delay:${i*0.06}s">
+      <div style="position:absolute;inset:0;background:var(--card-bg);display:flex;align-items:center;justify-content:center">
+        <span style="font-family:'Cormorant Garamond',serif;font-size:1.2rem;color:rgba(244,181,76,.08)">${s.name.charAt(0)}</span>
+      </div>
+      <div class="sc-gradient"></div>
+      <div class="sc-info">
+        <div class="sc-name">${s.name}</div>
+        <div class="sc-role">${s.tags[0]}</div>
+      </div>
+    </div>
+  `).join('');
+}
+
+function openDetail(i) {
+  const s = sculptures[i];
+  document.getElementById('view-locations').style.display='none';
+  document.getElementById('view-sculptures').style.display='none';
+  const el = document.getElementById('view-detail');
+  el.style.display='';
+
+  const has3D = s.modelUrl && s.modelUrl !== '#';
+
+  el.innerHTML = `
+    <div class="detail-hero">
+      <div style="width:100%;height:100%;background:var(--card-bg);display:flex;align-items:center;justify-content:center">
+        <span style="font-family:'Cormorant Garamond',serif;font-size:4rem;color:rgba(244,181,76,.06)">${s.name.charAt(0)}</span>
+      </div>
+      <div class="detail-hero-gradient"></div>
+      <button class="detail-back" onclick="openCity('skopje')">
+        <svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>
+        Back
+      </button>
+    </div>
+    <div class="detail-body">
+      <div class="detail-country">${s.country}</div>
+      <div class="detail-name">${s.name}</div>
+      <div class="detail-years">${s.years}</div>
+      <div class="detail-divider"></div>
+      <div class="detail-tags">${s.tags.map(t=>`<span class="detail-tag">${t}</span>`).join('')}</div>
+      <div class="detail-story">${s.story}</div>
+      ${s.achievements.map(a=>`<div class="detail-achievement"><strong>${a.label}</strong>${a.text}</div>`).join('')}
+      <div class="detail-actions">
+        ${has3D ? `<button class="action-btn" onclick="open3DViewer('${s.modelUrl}','${s.name}')">
+          <svg viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
+          View 3D Model
+        </button>` : `<div class="action-btn" style="opacity:.4;pointer-events:none">
+          <svg viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
+          3D Model — Coming Soon
+        </div>`}
+        <a class="action-btn primary" href="${s.mapUrl}" target="_blank" rel="noopener">
+          <svg viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z"/><circle cx="12" cy="9" r="2.5"/></svg>
+          Find the Original Sculpture
+        </a>
+      </div>
+    </div>
+  `;
+  window.scrollTo(0,0);
+}
+
+// ── 3D VIEWER ──
+function open3DViewer(url, name) {
+  document.getElementById('viewer-title').textContent = name + ' · 3D Model';
+  document.getElementById('viewer-frame').src = url + '?autostart=1&ui_theme=dark&ui_watermark=0&ui_infos=0';
+  document.getElementById('viewer-overlay').classList.add('open');
+}
+function closeViewer() {
+  document.getElementById('viewer-overlay').classList.remove('open');
+  document.getElementById('viewer-frame').src = '';
+}
+
+// ── EXPLORE PAGE ──
+let exploreState = { country:'North Macedonia', year:1960, sector:'all', results:null, loading:false };
+
+function initExplore() {
+  renderExplore();
+}
+
+function getEraLabel(y){
+  if(y<1600) return "Early Modern";
+  if(y<1700) return "16th Century";
+  if(y<1800) return "17th Century";
+  if(y<1850) return "18th Century";
+  if(y<1900) return "Early 19th Century";
+  if(y<1950) return "Late 19th–Early 20th C.";
+  if(y<2000) return "Mid–Late 20th Century";
+  return "21st Century";
+}
+
+function renderExplore() {
+  const s = exploreState;
+  const el = document.getElementById('explore-content');
+
+  let resultsHTML = '';
+  if(s.loading) {
+    resultsHTML = `<div style="text-align:center;padding:3rem 0">
+      <span style="font-size:2rem;color:var(--rose);animation:spin 2s linear infinite;display:inline-block">◈</span>
+      <p style="font-size:1rem;font-weight:300;font-style:italic;color:rgba(240,236,228,.5);margin-top:0.8rem">Searching the historical record…</p>
+    </div>`;
+  } else if(s.results && s.results.entries && s.results.entries.length > 0) {
+    resultsHTML = `
+      <div class="results-section">
+        <div class="results-header">
+          <div class="results-title"><span class="loc">${s.results.locationLabel}</span><br>${s.results.year}</div>
+          <div class="results-count">${s.results.entries.length} records</div>
+        </div>
+        ${s.results.summary ? `<div class="results-summary"><p>${s.results.summary}</p></div>` : ''}
+        ${s.results.entries.map((e,i)=>{
+          const born = e.born && String(e.born)!=='null' ? 'b. '+e.born : '';
+          const died = e.died && String(e.died)!=='null' ? 'd. '+e.died : '';
+          const dates = [born,died].filter(Boolean).join('  ·  ');
+          return `<div class="result-card" style="animation-delay:${i*0.05}s">
+            <span class="result-sector">${e.sector||'Other'}</span>
+            <div class="result-name">${e.name}</div>
+            ${dates ? `<div class="result-dates">${dates}</div>` : ''}
+            <p class="result-achievement">${e.achievement}</p>
+            <p class="result-significance">${e.significance}</p>
+          </div>`;
+        }).join('')}
+        <div class="results-footer">Data sourced from AI historical knowledge · Always verify with primary sources</div>
+      </div>
+    `;
+  } else if(s.results && (!s.results.entries || s.results.entries.length===0)) {
+    resultsHTML = `<div style="text-align:center;padding:2rem 0">
+      <div style="font-size:1.8rem;color:var(--muted);opacity:.4">◎</div>
+      <p style="font-size:1rem;font-weight:300;font-style:italic;color:rgba(240,236,228,.5);margin-top:0.5rem">Sparse records for this combination</p>
+      <p style="font-size:0.72rem;color:rgba(240,236,228,.35);margin-top:0.3rem">Try adjusting your search parameters.</p>
+    </div>`;
+  }
+
+  el.innerHTML = `
+    <div class="explore-intro">
+      <div class="explore-icon">✦</div>
+      <p class="explore-heading">Every year holds stories of women who <span>changed the world.</span></p>
+      <p class="explore-note">Pick a country · choose a year · discover history</p>
+    </div>
+
+    <div class="explore-form">
+      <label class="explore-label">① Location</label>
+      <select class="explore-select" onchange="exploreState.country=this.value">
+        ${COUNTRIES.map(c=>`<option value="${c}" ${c===s.country?'selected':''}>${c}</option>`).join('')}
+      </select>
+
+      <label class="explore-label">② Year</label>
+      <div class="explore-year-display">${s.year}</div>
+      <div class="explore-era">${getEraLabel(s.year)}</div>
+      <input class="explore-slider" type="range" min="1500" max="2025" value="${s.year}"
+        oninput="exploreState.year=+this.value;document.querySelector('.explore-year-display').textContent=this.value;document.querySelector('.explore-era').textContent=getEraLabel(+this.value)">
+      <div class="explore-range"><span>1500</span><span>1700</span><span>1900</span><span>2025</span></div>
+
+      <label class="explore-label" style="margin-top:1rem">③ Sector</label>
+      <div class="sector-grid">
+        ${SECTORS.map(sc=>`<button class="sector-btn ${s.sector===sc.id?'active':''}"
+          onclick="exploreState.sector='${sc.id}';renderExplore()">
+          <span style="font-style:normal;opacity:.6">${sc.g}</span> ${sc.label}
+        </button>`).join('')}
+      </div>
+
+      <button class="discover-btn ${s.loading?'loading':''}" onclick="doExploreSearch()" ${s.loading?'disabled':''}>
+        ${s.loading?'':'Discover Her Story'}
+      </button>
+    </div>
+
+    ${resultsHTML}
+  `;
+}
+
+async function doExploreSearch() {
+  const s = exploreState;
+  s.loading = true; s.results = null;
+  renderExplore();
+
+  const sectorLabel = SECTORS.find(x=>x.id===s.sector)?.label || '';
+  const prompt = `You are a historian specializing in women's history.\n\nFor the country "${s.country}" in the year ${s.year}, list remarkable achievements by women, ${s.sector==='all'?'covering ALL sectors':'focusing on: '+sectorLabel}.\n\nReturn ONLY raw JSON — no markdown, no code fences.\n\n{"summary":"string","entries":[{"name":"string","sector":"string","achievement":"string","significance":"string","born":null,"died":null}]}\n\nRules: born/died = integer year or null. 4-8 entries. Broaden ±10 years if needed. Real people only.`;
+
+  try {
+    const res = await fetch("https://api.anthropic.com/v1/messages",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({model:"claude-sonnet-4-20250514",max_tokens:3000,messages:[{role:"user",content:prompt}]})});
+    const data = await res.json();
+    const raw = (data.content||[]).filter(b=>b.type==="text").map(b=>b.text).join("");
+    let jsonStr = raw.replace(/```json[\s\S]*?```/gi,m=>m.replace(/```json\s*/i,"").replace(/```$/,"")).replace(/```[\s\S]*?```/gi,m=>m.replace(/```\s*/gi,"")).trim();
+    const start=jsonStr.indexOf("{"), end=jsonStr.lastIndexOf("}");
+    if(start!==-1&&end!==-1) jsonStr=jsonStr.slice(start,end+1);
+    let parsed;
+    try{parsed=JSON.parse(jsonStr)}catch{try{parsed=JSON.parse(jsonStr.replace(/,\s*([}\]])/g,"$1"))}catch{parsed=null}}
+    if(parsed && Array.isArray(parsed.entries)) {
+      parsed.entries = parsed.entries.filter(e=>e&&typeof e.name==='string'&&e.name.trim());
+      s.results = {...parsed, locationLabel:s.country, year:s.year};
+    } else {
+      s.results = {locationLabel:s.country,year:s.year,entries:[]};
+    }
+  } catch(err) {
+    s.results = {locationLabel:s.country,year:s.year,entries:[],fetchError:true};
+  }
+  s.loading = false;
+  renderExplore();
+}
+
+// ── INIT ──
+showLocations();
+triggerReveals('page-home');
+
+// ── SERVICE Worker Registration ──
+if('serviceWorker' in navigator) {
+  window.addEventListener('load',()=>{
+    navigator.serviceWorker.register('sw.js').catch(()=>{});
+  });
+}
+</script>
+</body>
+</html>
